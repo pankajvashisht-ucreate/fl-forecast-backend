@@ -1,0 +1,62 @@
+version: "3"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-breeze-api
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - pg
+    ports:
+      - 808:80  
+    environment:
+      APP_DEBUG: 'true'
+      APP_NAME: 'Forcast-app'
+      APP_ENV: 'local'
+      # Generate a new key and paste below
+      APP_KEY: 'base64:OoBYmwIIal8E8oeiX0oxZEx5/4V0/ZOa5nwsIwpcqQk='
+      LOG_LEVEL: 'debug'
+      APP_URL: 'http://210.119.1.1'
+      DB_CONNECTION: 'pgsql'
+      DATABASE_URL: 'pgsql://postgres:docker@pg:5432/postgres'
+      FORECAST_API_KEY: '858f15fed9292cbe25c341a754c55e45'
+    networks:
+      breeze:
+        ipv4_address: 210.119.1.1
+
+  pg:
+    image: postgres:latest
+    volumes:
+      - breeze_db_data:/var/lib/postgres
+    ports:
+      - 2345:5432  
+    container_name: laravel-breeze-pg
+    environment:
+      POSTGRES_PASSWORD: docker
+    networks:
+      breeze:
+        ipv4_address: 210.119.1.2
+
+  # redis:
+  #   image: redis:alpine
+  #   command: redis-server --requirepass docker
+  #   ports:
+  #     - 8379:6379
+  #   volumes:
+  #     - $PWD/redis-data:/var/lib/redis
+  #   environment:
+  #     - REDIS_REPLICATION_MODE=master
+  #   networks:
+  #     breeze:
+  #       ipv4_address: 210.119.1.3
+
+volumes:
+  breeze_db_data: {}
+networks:
+  breeze:
+    ipam:
+      driver: default
+      config:
+        - subnet: 210.119.0.0/16

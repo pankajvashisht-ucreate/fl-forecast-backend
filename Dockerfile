@@ -1,0 +1,1 @@
+FROM jdecode/laravel-boilerplate
